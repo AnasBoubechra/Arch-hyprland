@@ -1,0 +1,38 @@
+#!/bin/sh
+
+while read file 
+do
+ case "$1" in
+ "j")  
+    killall swaybg
+    swaybg -m fill -i $file &
+    ;;
+ "c")
+    [ -z "$destdir" ] && destdir="$( echo "" | wofi -d  -i -p "Copy file(s) to where?" | sed "s|~|$HOME|g")"
+   	[ ! -d "$destdir" ] && dunstify "$destdir is not a directory, cancelled." && exit
+    cp "$file" "$destdir" && dunstify -i "$(readlink -f "$file")" "$file copied to $destdir." &
+    ;;
+ "m")
+    [ -z "$destdir" ] && destdir="$( echo "" | wofi -d  -i -p "Move file(s) to where?" | sed "s|~|$HOME|g")"
+    [ ! -d "$destdir" ] && dunstify "$destdir is not a directory, cancelled." && exit
+    mv "$file" "$destdir" && dunstify -i "$(readlink -f "$file")" "$file moved to $destdir." &
+    ;;
+ "y")
+    echo -n "$file" | tr -d '\n' | wl-copy &&
+    dunstify "$file copied to clipboard" & 
+    ;;
+ "Y")
+    readlink -f "$file" | tr -d '\n' | wl-copy &&
+    dunstify "$(readlink -f "$file") copied to clipboard" & 
+    ;;
+ "i")	dunstify "File information" "$(mediainfo "$file")" 
+    ;;
+ "r") [ -z "$rename" ] && rename="$(echo "" | wofi -d -i -p "Rename the image:")" 
+      mv "$file" "$rename" && dunstify "Renaming $file to $rename" 
+    ;;
+ "R") convert -rotate 90 "$file" "$file" 
+    ;;
+"d") [ "$(echo "" | wofi -d -p 'Delete all of the selected image(s)?')" = "y" ] && rm "$file" && dunstify "$file deleted"
+   ;;
+ esac
+done

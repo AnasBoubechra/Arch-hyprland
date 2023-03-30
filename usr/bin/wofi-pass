@@ -1,0 +1,34 @@
+#!/bin/sh
+
+prefix=${PASSWORD_STORE_DIR-~/.password-store}
+
+cd $prefix 
+
+password_files="$(find . -name "*.gpg" | sed "s/^\.\/\(.*\)\.gpg$/\1/")"
+otp_files="$(find . -name "o-*.gpg" | sed "s/^\.\/\(.*\)\.gpg$/\1/")"
+
+gen(){
+    openssl rand -base64 32 | wl-copy
+}
+
+case $1 in
+    -g|gen) gen;;
+    -p|pass) 
+        password=$(printf '%s\n' "$password_files" | wofi --dmenu)
+        [ -n "$password" ] || exit
+        pass show "$password" | wl-copy -n
+        ;;
+    -o|otp) 
+        password=$(printf '%s\n' "$otp_files" | wofi --dmenu)
+        pass otp -c "$password"
+        ;;
+    -h|help)
+        printf "
+Usage: wofi-pass [options]
+        -g  gen     generate a password (32 char long) and copy it to the clipboard
+        -p  pass    get the password and pipe it to wofi -d
+        -o  otp     get the otp pin code
+        -h  help    show this message
+        \n"
+        ;;
+esac
