@@ -2,7 +2,7 @@
 ![Screenshot](dm.jpg)
 
 1. The full Installation guide can be found [here](http://cschad.tech/posts/hyprland_installation_archlinux/)
-2. [Configuration](http://cschad.tech/posts/hyprland_configuration.md/)
+2. [Configuration](https://cschad.tech/posts/hyprland_configuration/)
     * Volume and Brightness
     * waybar
     * Notification daemon
